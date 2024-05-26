@@ -25,7 +25,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "eslintConfig": {
     "extends": [
@@ -47,11 +50,13 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.12.3",
-    "@graphql-codegen/cli": "^5.0.2",
-    "@graphql-codegen/client-preset": "^4.2.6",
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/client-preset": "4.2.6",
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@parcel/watcher": "^2.4.1",
+    "gh-pages": "^6.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
-  }
+  },
+  "homepage": "https://andreas-blvc.github.io/Star-Wars-Reference/"
 }

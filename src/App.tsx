@@ -1,5 +1,5 @@
 import React from 'react';
-import CharacterTable from './components/CharacterTable';
+import CharacterOverview from './components/CharacterOverview';
 
 const App: React.FC = () => {
   return (
@@ -8,7 +8,7 @@ const App: React.FC = () => {
         <h1>Star Wars Characters</h1>
       </header>
       <main>
-        <CharacterTable />
+        <CharacterOverview pageSize={16} />
       </main>
     </div>
   );

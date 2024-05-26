@@ -1,5 +1,5 @@
-/* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -7,6 +7,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -1304,7 +1305,9 @@ export type VehiclesEdge = {
   node?: Maybe<Vehicle>;
 };
 
-export type CharacterDetailsFragment = { __typename?: 'Person', id: string, name?: string | null, height?: number | null, mass?: number | null, gender?: string | null, eyeColor?: string | null, homeworld?: { __typename?: 'Planet', name?: string | null } | null, species?: { __typename?: 'Species', name?: string | null } | null, filmConnection?: { __typename?: 'PersonFilmsConnection', films?: Array<{ __typename?: 'Film', title?: string | null } | null> | null } | null } & { ' $fragmentName'?: 'CharacterDetailsFragment' };
+export type FilmFragment = { __typename?: 'Film', title?: string | null };
+
+export type CharacterDetailsFragment = { __typename?: 'Person', id: string, name?: string | null, height?: number | null, mass?: number | null, gender?: string | null, eyeColor?: string | null, homeworld?: { __typename?: 'Planet', name?: string | null } | null, species?: { __typename?: 'Species', name?: string | null } | null, filmConnection?: { __typename?: 'PersonFilmsConnection', films?: Array<{ __typename?: 'Film', title?: string | null } | null> | null } | null };
 
 export type AllCharactersQueryVariables = Exact<{
   first: Scalars['Int']['input'];
@@ -1314,5 +1317,79 @@ export type AllCharactersQueryVariables = Exact<{
 
 export type AllCharactersQuery = { __typename?: 'Root', allPeople?: { __typename?: 'PeopleConnection', totalCount?: number | null, edges?: Array<{ __typename?: 'PeopleEdge', node?: { __typename?: 'Person', id: string, name?: string | null, height?: number | null, mass?: number | null, gender?: string | null, eyeColor?: string | null, homeworld?: { __typename?: 'Planet', name?: string | null } | null, species?: { __typename?: 'Species', name?: string | null } | null, filmConnection?: { __typename?: 'PersonFilmsConnection', films?: Array<{ __typename?: 'Film', title?: string | null } | null> | null } | null } | null } | null> | null, pageInfo: { __typename?: 'PageInfo', endCursor?: string | null, hasNextPage: boolean } } | null };
 
-export const CharacterDetailsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CharacterDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"mass"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"eyeColor"}},{"kind":"Field","name":{"kind":"Name","value":"homeworld"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"species"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"filmConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"films"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<CharacterDetailsFragment, unknown>;
-export const AllCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllCharacters"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allPeople"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"mass"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"eyeColor"}},{"kind":"Field","name":{"kind":"Name","value":"homeworld"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"species"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"filmConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"films"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<AllCharactersQuery, AllCharactersQueryVariables>;
+export const FilmFragmentDoc = gql`
+    fragment Film on Film {
+  title
+}
+    `;
+export const CharacterDetailsFragmentDoc = gql`
+    fragment CharacterDetails on Person {
+  id
+  name
+  height
+  mass
+  gender
+  eyeColor
+  homeworld {
+    name
+  }
+  species {
+    name
+  }
+  filmConnection {
+    films {
+      ...Film
+    }
+  }
+}
+    ${FilmFragmentDoc}`;
+export const AllCharactersDocument = gql`
+    query AllCharacters($first: Int!, $after: String) {
+  allPeople(first: $first, after: $after) {
+    edges {
+      node {
+        ...CharacterDetails
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    totalCount
+  }
+}
+    ${CharacterDetailsFragmentDoc}`;
+
+/**
+ * __useAllCharactersQuery__
+ *
+ * To run a query within a React component, call `useAllCharactersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllCharactersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllCharactersQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useAllCharactersQuery(baseOptions: Apollo.QueryHookOptions<AllCharactersQuery, AllCharactersQueryVariables> & ({ variables: AllCharactersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllCharactersQuery, AllCharactersQueryVariables>(AllCharactersDocument, options);
+      }
+export function useAllCharactersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllCharactersQuery, AllCharactersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllCharactersQuery, AllCharactersQueryVariables>(AllCharactersDocument, options);
+        }
+export function useAllCharactersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AllCharactersQuery, AllCharactersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AllCharactersQuery, AllCharactersQueryVariables>(AllCharactersDocument, options);
+        }
+export type AllCharactersQueryHookResult = ReturnType<typeof useAllCharactersQuery>;
+export type AllCharactersLazyQueryHookResult = ReturnType<typeof useAllCharactersLazyQuery>;
+export type AllCharactersSuspenseQueryHookResult = ReturnType<typeof useAllCharactersSuspenseQuery>;
+export type AllCharactersQueryResult = Apollo.QueryResult<AllCharactersQuery, AllCharactersQueryVariables>;

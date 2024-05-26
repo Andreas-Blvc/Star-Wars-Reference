@@ -1,0 +1,23 @@
+fragment Film on Film {
+  title
+}
+
+fragment CharacterDetails on Person {
+  id
+  name
+  height
+  mass
+  gender
+  eyeColor
+  homeworld {
+    name
+  }
+  species {
+    name
+  }
+  filmConnection {
+    films {
+      ...Film
+    }
+  }
+}

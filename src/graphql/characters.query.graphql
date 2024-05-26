@@ -1,0 +1,14 @@
+query AllCharacters($first: Int!, $after: String) {
+  allPeople(first: $first, after: $after) {
+    edges {
+      node {
+        ...CharacterDetails
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    totalCount
+  }
+}

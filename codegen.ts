@@ -1,14 +1,20 @@
-import { CodegenConfig } from '@graphql-codegen/cli'
- 
+
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
 const config: CodegenConfig = {
-  schema: 'https://swapi-graphql.netlify.app/.netlify/functions/index',
-  documents: ['src/graphql/**/*.ts'],
-  ignoreNoDocuments: true, // for better experience with the watcher
+  overwrite: true,
+  schema: "https://swapi-graphql.netlify.app/.netlify/functions/index",
+  documents: "src/graphql/*.graphql",
   generates: {
-    './src/generated/': {
-      preset: 'client',
+    "src/graphql/__generated__/types.ts": {
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-react-apollo",
+      ],
+      config: {},
     }
   }
-}
- 
-export default config
+};
+
+export default config;
