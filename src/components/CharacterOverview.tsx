@@ -4,30 +4,16 @@ import {
 	useAllCharactersQuery,
 	CharacterDetailsFragment
 } from '../graphql/__generated__/types';
-import { isAvailable } from '../utils/helper';
+import { applyFilter, createFilterValues, getUniqueFilterOptions, FilterKey } from '../utils/characterFilter';
 import FilterControls from './FilterControls';
 import CharacterTable from './CharacterTable';
 import CharacterModal from './CharacterModal';
 
-enum FilterKey { Gender, EyeColor, Species, Film, FavoritesOnly };
-
-// Configuration for filtering characters
-const filterConfig = [
-	{ key: FilterKey.Gender, label: 'Gender', getValue: (character: CharacterDetailsFragment) => character.gender },
-	{ key: FilterKey.EyeColor, label: 'Eye Color', getValue: (character: CharacterDetailsFragment) => character.eyeColor },
-	{ key: FilterKey.Species, label: 'Species', getValue: (character: CharacterDetailsFragment) => character.species?.name },
-	{
-		key: FilterKey.Film, label: 'Film', getValue: (character: CharacterDetailsFragment) =>
-			character.filmConnection?.films?.map(film => film?.title).filter(Boolean) as string[] ?? []
-	},
-	{ key: FilterKey.FavoritesOnly, label: 'Favorites Only', getValue: () => null }
-];
 
 // Component for displaying character overview
 const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 	const { data, loading, error, fetchMore } = useAllCharactersQuery({ variables: { first: pageSize } });
 	const totalCount = data?.allPeople?.totalCount ?? 0;
-
 
 
 	// State for managing favorite characters
@@ -36,17 +22,14 @@ const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 		return savedFavorites ? JSON.parse(savedFavorites) : [];
 	});
 
+	// State for managing filter mode:
+	const [favoritesOnly, setFavoritesOnly] = useState<boolean>(false)
+
 	// State for managing filter options
-	const [filters, setFilters] = useState<Record<string, string[] | boolean>>(
-		filterConfig.reduce((acc, filter) => {
-			acc[filter.key] = filter.key === FilterKey.FavoritesOnly ? false : [];
-			return acc;
-		}, {} as Record<string, string[] | boolean>)
-	);
+	const [filterValues, setFilterValues] = useState<Record<FilterKey, string[]>>(createFilterValues());
 
 	// State for managing selected character
 	const [selectedCharacter, setSelectedCharacter] = useState<CharacterDetailsFragment | null>(null);
-
 
 
 	// Effect to sync favorite characters with local storage
@@ -57,41 +40,12 @@ const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 
 
 	// Filter characters based on selected filters
-	const allCharacters: CharacterDetailsFragment[] = filters[FilterKey.FavoritesOnly] ? favorites : (data?.allPeople?.edges ?? [])
+	const allCharacters: CharacterDetailsFragment[] = favoritesOnly ? favorites : (data?.allPeople?.edges ?? [])
 		.filter(edge => edge && edge.node)
 		.map(edge => edge!.node as CharacterDetailsFragment);
 
-	const filteredCharacters: CharacterDetailsFragment[] = allCharacters.filter(character => {
-		return filterConfig
-			.filter(filter => filter.key !== FilterKey.FavoritesOnly)
-			.every(filter => {
-				const filterValues = filters[filter.key] as string[];
-				const characterValues = filter.getValue(character);
 
-				if (filter.key === FilterKey.Film) {
-					return !filterValues.length || (characterValues && (characterValues as string[]).some(value => filterValues.includes(value)));
-				} else {
-					return !filterValues.length || (characterValues && filterValues.includes(characterValues as string));
-				}
-			});
-	});
-
-
-
-	// Generate filter options for FilterControls component
-	const filterOptions = filterConfig.map(filter => {
-		if (filter.key === FilterKey.FavoritesOnly) {
-			return { label: filter.label, options: [] };
-		} else {
-			const uniqueValues = Array.from(new Set(allCharacters
-				.flatMap(character => filter.getValue(character))
-				.filter(isAvailable)
-			)) as string[];
-			return { label: filter.label, options: uniqueValues };
-		}
-	});
-
-
+	const filteredCharacters: CharacterDetailsFragment[] = applyFilter(filterValues, allCharacters);
 
 	// Toggle favorite status of a character
 	const toggleFavorite = (character: CharacterDetailsFragment) => {
@@ -99,13 +53,12 @@ const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 		const updatedFavorites = isFavorite
 			? favorites.filter(fav => fav.id !== character.id)
 			: [...favorites, character];
-
 		setFavorites(updatedFavorites);
 	};
 
 	// Handle filter change event
-	const handleFilterChange = (filterKey: FilterKey, values: string[] | boolean) => {
-		setFilters(prevFilters => ({
+	const handleFilterChange = (filterKey: FilterKey, values: string[]) => {
+		setFilterValues(prevFilters => ({
 			...prevFilters,
 			[filterKey]: values,
 		}));
@@ -157,13 +110,50 @@ const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 		</div >
 	)
 
+	const getLabel = (filterKey: FilterKey): string => {
+		switch (filterKey) {
+			case FilterKey.EyeColor: return 'Eye Color';
+			case FilterKey.Film: return 'Film';
+			case FilterKey.Gender: return 'Gender';
+			case FilterKey.Species: return 'Species';
+		}
+	}
+
+	const getFilterControls = () => {
+		return Object.keys(FilterKey).reduce((acc, e: string) => {
+			const filterKey = Number(e);
+			if (!Number.isNaN(filterKey)) {
+				acc.push({
+					key: filterKey,
+					label: getLabel(filterKey),
+					options: getUniqueFilterOptions(filterKey, allCharacters) as string[],
+					values: filterValues[filterKey as FilterKey],
+				});
+			}
+			return acc;
+		}, [] as { key: number; label: string; options: string[]; values: string[] }[])
+	}
+
 	// Render character overview
 	return (
 		<>
 			<FilterControls
-				filterOptions={filterOptions}
-				filterValues={filters}
+				filters={getFilterControls()}
 				onFilterChange={handleFilterChange}
+				filterToggles={
+					[
+						{
+							key: 42,
+							label: 'Favorites Only',
+							value: favoritesOnly,
+						}
+					]
+				}
+				onToggleChange={(key, value) => {
+					if (key === 42) {
+						setFavoritesOnly(value);
+					}
+				}}
 			/>
 			<CharacterTable
 				characters={filteredCharacters ?? []}
@@ -172,7 +162,7 @@ const CharacterOverview: React.FC<{ pageSize: number }> = ({ pageSize }) => {
 				setSelectedCharacter={setSelectedCharacter}
 			/>
 			{
-				!filters[FilterKey.FavoritesOnly] &&
+				!favoritesOnly &&
 				<div style={{ textAlign: 'center', margin: 20 }}>
 					<Button type="primary" onClick={handleLoadMore} disabled={allCharacters.length >= totalCount}>Load More</Button>
 				</div>

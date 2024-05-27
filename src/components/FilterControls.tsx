@@ -3,52 +3,59 @@ import { Select, Checkbox } from 'antd';
 
 const { Option } = Select;
 
-interface FilterOption {
+interface Filter {
+	key: number;
 	label: string;
 	options: string[];
+	values: string[];
+}
+
+interface FilterToggle {
+	key: number;
+	label: string;
+	value: boolean;
 }
 
 interface FilterControlsProps {
-	filterOptions: FilterOption[];
-	filterValues: Record<string, string[] | boolean>;
-	onFilterChange: (filterKey: number, values: string[] | boolean) => void;
+	filters: Filter[];
+	onFilterChange: (filterKey: number, values: string[]) => void;
+	filterToggles: FilterToggle[],
+	onToggleChange: (filterToggleKey: number, value: boolean) => void;
 }
 
-const FilterControls: React.FC<FilterControlsProps> = ({
-	filterOptions,
-	filterValues,
-	onFilterChange,
-}) => {
-	const handleFilterChange = (filterKey: number, values: string[] | boolean) => {
-		onFilterChange(filterKey, values);
-	};
-	console.log(filterValues);
-	console.log(filterOptions);
 
+const FilterControls: React.FC<FilterControlsProps> = ({
+	filters,
+	onFilterChange,
+	filterToggles,
+	onToggleChange
+}) => {
 	return (
 		<div style={{ marginBottom: 16 }}>
-			{filterOptions.map((filterOption, index) => (
-				<label key={index} style={{ marginLeft: index > 0 ? 16 : 0 }}>
-					{filterOption.label}:
-					{typeof filterValues[index] === 'boolean' ? (
-						<Checkbox
-							checked={filterValues[index] as boolean}
-							onChange={(e) => handleFilterChange(index, e.target.checked)}
-							style={{ marginLeft: 8 }}
-						/>
-					) : (
-						<Select
-							mode="multiple"
-							style={{ width: 200, marginLeft: 8 }}
-							placeholder={`Select ${filterOption.label}`}
-							onChange={(values: string[]) => handleFilterChange(index, values)}
-							value={filterValues[index] as string[]}
-						>
-							{filterOption.options.map(option => (
-								<Option key={option} value={option}>{option}</Option>
-							))}
-						</Select>
-					)}
+			{filters.map((filter, index) => (
+				<label key={filter.key} style={{ marginLeft: index > 0 ? 16 : 0 }}>
+					{filter.label}:
+					<Select
+						mode="multiple"
+						style={{ width: 200, marginLeft: 8 }}
+						placeholder={`Select ${filter.label}`}
+						onChange={(values: string[]) => onFilterChange(filter.key, values)}
+						value={filter.values}
+					>
+						{filter.options.map(option => (
+							<Option key={option} value={option}>{option}</Option>
+						))}
+					</Select>
+				</label>
+			))}
+			{filterToggles.map((filterToggle) => (
+				<label key={filterToggle.key} style={{ marginLeft: 16 }}>
+					{filterToggle.label}:
+					<Checkbox
+						checked={filterToggle.value}
+						onChange={(e) => onToggleChange(filterToggle.key, e.target.checked)}
+						style={{ marginLeft: 8 }}
+					/>
 				</label>
 			))}
 		</div>
